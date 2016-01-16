@@ -112,7 +112,8 @@
     <EmbeddedResource Include="Properties\BufsupAsync.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="LRSkipAsync">
+    <Reference Include="LRSkipAsync, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>.\LRSkipAsync.dll</HintPath>
     </Reference>
   </ItemGroup>

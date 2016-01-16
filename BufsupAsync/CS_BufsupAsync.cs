@@ -11,8 +11,12 @@ namespace BufsupAsync
     public class CS_BufsupAsync
     {
         #region 共有領域
+        // '16.01.13 両側余白情報削除の追加　及び、右側・左側余白処理のコメント化
+/*
         CS_RskipAsync rskip;             // 右側余白情報を削除
         CS_LskipAsync lskip;             // 左側余白情報を削除
+*/
+        CS_LRskipAsync lrskip;           // 両側余白情報を削除
 
         private String _wbuf;       // ソース情報
         private Boolean _empty;     // ソース情報有無
@@ -34,16 +38,12 @@ namespace BufsupAsync
                 else
                 {   // 整形処理を行う
                     // 不要情報削除
-                    if (rskip == null || lskip == null)
+                    if (lrskip == null)
                     {   // 未定義？
-                        rskip = new CS_RskipAsync();
-                        lskip = new CS_LskipAsync();
+                        lrskip = new CS_LRskipAsync();
                     }
-                    rskip.Wbuf = _wbuf;
-                    rskip.ExecAsync();
-                    lskip.Wbuf = rskip.Wbuf;
-                    lskip.ExecAsync();
-                    _wbuf = lskip.Wbuf;
+                    lrskip.ExecAsync(_wbuf);
+                    _wbuf = lrskip.Wbuf;
 
                     // 作業の為の下処理
                     if (_wbuf.Length == 0 || _wbuf == null)
@@ -85,8 +85,7 @@ namespace BufsupAsync
             _rem = null;
             _remark = false;
 
-            rskip = null;
-            lskip = null;
+            lrskip = null;
         }
         #endregion
 
@@ -98,8 +97,7 @@ namespace BufsupAsync
             _rem = null;
             _remark = false;
 
-            rskip = null;
-            lskip = null;
+            lrskip = null;
         }
         public async Task ExecAsync()
         {   // 構文評価を行う
@@ -109,10 +107,9 @@ namespace BufsupAsync
                 int _pos;       // 位置情報
                 _rem = null;        // コメント情報初期化
                 Boolean _judge = false;     // Rskip稼働の判断     
-                if (rskip == null || lskip == null)
-                {
-                    rskip = new CS_RskipAsync();
-                    lskip = new CS_LskipAsync();
+                if (lrskip == null)
+                {   // 未定義？
+                    lrskip = new CS_LRskipAsync();
                 }
 
                 do
@@ -184,10 +181,10 @@ namespace BufsupAsync
                 int _pos;       // 位置情報
                 _rem = null;        // コメント情報初期化
                 Boolean _judge = false;     // Rskip稼働の判断     
-                if (rskip == null || lskip == null)
-                {
-                    rskip = new CS_RskipAsync();
-                    lskip = new CS_LskipAsync();
+
+                if (lrskip == null)
+                {   // 未定義？
+                    lrskip = new CS_LRskipAsync();
                 }
 
                 do
@@ -277,11 +274,8 @@ namespace BufsupAsync
         }
         private async Task Reskip()
         {
-            rskip.Wbuf = _wbuf;
-            await rskip.ExecAsync();
-            lskip.Wbuf = rskip.Wbuf;
-            await lskip.ExecAsync();
-            _wbuf = lskip.Wbuf;
+            await lrskip.ExecAsync(_wbuf);
+            _wbuf = lrskip.Wbuf;
         }
         private async Task SetbufAsync(String _strbuf)
         {   // [_wbuf]情報設定
@@ -293,16 +287,12 @@ namespace BufsupAsync
             else
             {   // 整形処理を行う
                 // 不要情報削除
-                if (rskip == null || lskip == null)
+                if (lrskip == null)
                 {   // 未定義？
-                    rskip = new CS_RskipAsync();
-                    lskip = new CS_LskipAsync();
+                    lrskip = new CS_LRskipAsync();
                 }
-                rskip.Wbuf = _wbuf;
-                await rskip.ExecAsync();
-                lskip.Wbuf = rskip.Wbuf;
-                await lskip.ExecAsync();
-                _wbuf = lskip.Wbuf;
+                await lrskip.ExecAsync(_wbuf);
+                _wbuf = lrskip.Wbuf;
 
                 // 作業の為の下処理
                 if (_wbuf.Length == 0 || _wbuf == null)
@@ -314,6 +304,8 @@ namespace BufsupAsync
                 {
                     _empty = false;
                 }
+
+                _rem = null;        // 注釈情報　初期化
             }
         }
         #endregion
