@@ -74,6 +74,10 @@ namespace BufsupAsync
             {
                 return (_remark);
             }
+            set
+            {   // 16.01.28 連続呼び出し時の状況設定追加
+                _remark = value;
+            }
         }
         #endregion
 
