@@ -16,6 +16,8 @@
         <TextBox x:Name="textBox02" HorizontalAlignment="Left" Margin="216,100,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" RenderTransformOrigin="2.028,-12.844" Height="50" Width="807"/>
         <Button x:Name="button01" Content="Ｂｕｆｓｕｐ" HorizontalAlignment="Right" Margin="0,0,197,58" VerticalAlignment="Bottom" Click="button01_Click"/>
         <Button x:Name="button02" Content="Ｒｅｓｅｔ" HorizontalAlignment="Right" Margin="0,0,50,58" VerticalAlignment="Bottom" Click="button02_Click"/>
+        <Button x:Name="button03" Content="Bufsup(Other)" HorizontalAlignment="Right" Margin="0,0,354,58" VerticalAlignment="Bottom" 
+                Click="button03_Click" />
 
     </Grid>
 </Page>

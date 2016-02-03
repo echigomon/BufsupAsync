@@ -18,10 +18,10 @@ namespace BufsupAsync
 */
         CS_LRskipAsync lrskip;           // 両側余白情報を削除
 
-        private String _wbuf;       // ソース情報
-        private Boolean _empty;     // ソース情報有無
-        private String _rem;        // 注釈情報
-        private Boolean _remark;    // 注釈管理情報
+        private static String _wbuf;       // ソース情報
+        private static Boolean _empty;     // ソース情報有無
+        private static String _rem;        // 注釈情報
+        private static Boolean _remark;    // 注釈管理情報
         public String Wbuf
         {
             get
@@ -248,6 +248,83 @@ namespace BufsupAsync
 
             }
 
+        }
+
+        public async Task<Boolean> ExecAsync(Boolean remflg, String msg)
+        {   // 構文評価を行う
+            await SetbufAsync(msg);                 // 入力内容の作業領域設定
+            _remark = remflg;                       // コメント情報を設定
+
+            if (!_empty)
+            {   // バッファーに実装有り
+                // 構文評価を行う
+                int _pos;       // 位置情報
+                _rem = null;        // コメント情報初期化
+                Boolean _judge = false;     // Rskip稼働の判断     
+
+                if (lrskip == null)
+                {   // 未定義？
+                    lrskip = new CS_LRskipAsync();
+                }
+
+                do
+                {
+                    if (_judge == true)
+                    {   // Rskip稼働？                      
+                        await Reskip();          // Rskip・Lskip稼働
+                        _judge = false;
+                        if (_wbuf == null)
+                        {   // 評価対象が存在しない？
+                            break;
+                        }
+                    }
+
+                    _pos = _wbuf.IndexOf(@"//");
+                    if (_pos != -1)
+                    {   // コメント"//"検出？
+                        await Supsub(_pos);
+                        break;
+                    }
+
+                    _pos = _wbuf.IndexOf(@"/*");
+                    if (_pos != -1)
+                    {   // コメント"/*"検出？
+                        await Supsub(_pos);
+                        _remark = true;         // コメント開始
+                        _judge = true;          // Rskip稼働
+                    }
+
+                    _pos = _wbuf.IndexOf(@"*/");
+                    if (_pos != -1)
+                    {   // コメント"*/"検出？
+                        await RSupsub(_pos);
+                        _remark = false;        // コメント終了
+                        _judge = true;          // Rskip稼働
+                    }
+
+                    if (_rem != null)
+                    {   // コメント設定有り？
+                        _pos = _rem.IndexOf(@"*/");
+                        if (_pos != -1)
+                        {   // コメント"*/"検出？
+                            await RRSupsub(_pos);
+                            _remark = false;        // コメント終了
+                            _judge = true;          // Rskip稼働
+                        }
+
+                    }
+                } while (_pos > 0);
+
+                await Reskip();              // Rskip稼働
+                if (_wbuf == null)
+                {   // バッファー情報無し
+                    // _wbuf = null;
+                    _empty = true;
+                }
+
+            }
+
+            return _remark;                     // コメントの継続情報を返す
         }
         #endregion
 

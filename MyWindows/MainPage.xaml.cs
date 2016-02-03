@@ -68,5 +68,20 @@ namespace MyWindows
             textBox02.Text = "";
         }
         #endregion
+
+        #region ［Ｂｕｆｓｕｐ(Other)］ボタン押下
+        private async void button03_Click(object sender, RoutedEventArgs e)
+        {   // [Bufsup(Other)]ボタン押下
+            Boolean Judge = false;
+            String KeyWord = textBox02.Text;
+
+            await bufsup.ClearAsync();
+            Judge = await bufsup.ExecAsync(Judge, KeyWord);
+
+            WriteLineResult("Result : Wbuf[{0}]", bufsup.Wbuf);
+            WriteLineResult("\n       : Rem[{0}]", bufsup.Rem);
+            WriteLineResult("\n       : Judge[{0}]", Judge);
+        }
+        #endregion
     }
 }
